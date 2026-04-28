@@ -1,5 +1,5 @@
 /* ============================================================
-   Vidya AI – app.js (Groq Version)
+   Visha AI – app.js (Groq Version)
    ============================================================ */
 
 'use strict';
@@ -11,7 +11,7 @@ const GROQ_API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://api.
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const MAX_RETRIES = 3;
 
-const SYSTEM_PROMPT = `You are Vidya AI, a friendly and smart student study assistant. Help students understand difficult concepts in simple language. Always explain with examples. Keep answers short and clear. You specialize in Math, Science, History, and English for Indian students.
+const SYSTEM_PROMPT = `You are Visha AI, a friendly and smart student study assistant. Help students understand difficult concepts in simple language. Always explain with examples. Keep answers short and clear. You specialize in Math, Science, History, and English for Indian students.
 
 Additional guidelines:
 - Use simple, easy-to-understand English. Avoid heavy jargon.
@@ -21,11 +21,11 @@ Additional guidelines:
 - Be warm, encouraging, and patient — like a friendly elder sibling or tutor.`;
 
 const SUBJECT_CONFIG = {
-  General:  { icon: '💬', color: '#7c6af7', hint: 'Ask me anything!' },
-  Math:     { icon: '📐', color: '#f59e0b', hint: 'Show me a problem to solve!' },
-  Science:  { icon: '🔬', color: '#22c55e', hint: 'What concept shall we explore?' },
-  History:  { icon: '📜', color: '#ef4444', hint: 'Which event or period?' },
-  English:  { icon: '📝', color: '#3b82f6', hint: 'Grammar, essay, or comprehension?' },
+  General:  { icon: '⭐', color: '#a855f7', hint: 'Ask me anything!' },
+  Math:     { icon: '🧮', color: '#f97316', hint: 'Show me a problem to solve!' },
+  Science:  { icon: '🧪', color: '#22c55e', hint: 'What concept shall we explore?' },
+  History:  { icon: '📜', color: '#eab308', hint: 'Which event or period?' },
+  English:  { icon: '📘', color: '#3b82f6', hint: 'Grammar, essay, or comprehension?' },
 };
 
 const QUICK_PROMPTS = {
@@ -36,10 +36,20 @@ const QUICK_PROMPTS = {
   English:  ['What are the tenses in English?', 'How to write a good essay?'],
 };
 
+const MOTIVATIONAL_QUOTES = [
+  "💡 Tip of the day: Consistency beats talent!",
+  "🚀 Keep going, you're doing great!",
+  "🧠 The more you learn, the more you grow.",
+  "✨ Your hard work will pay off soon!",
+  "📚 Knowledge is the most powerful weapon.",
+  "💪 Success is not final, failure is not fatal.",
+  "🌟 Believe in yourself and anything is possible!"
+];
+
 // ── State ──────────────────────────────────────────────────
-let apiKey = localStorage.getItem('vidya_api_key') || '';
+let apiKey = localStorage.getItem('visha_api_key') || '';
 let currentSubject = 'General';
-let conversationHistory = []; // { role, content }
+let chatHistory = []; // { role, content }
 let isLoading = false;
 
 // ── DOM Refs ────────────────────────────────────────────────
@@ -57,6 +67,7 @@ const currentSubjectIcon  = document.getElementById('current-subject-icon');
 const currentSubjectLabel = document.getElementById('current-subject-label');
 const subjectChip     = document.getElementById('subject-chip');
 const sidebar         = document.getElementById('sidebar');
+const motivationalBanner = document.getElementById('motivational-banner');
 
 // ── Init ────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -67,7 +78,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       showApiModal();
     }
-  }, 2700);
+  }, 1500);
 });
 
 function showApiModal() { apiModal.classList.remove('hidden'); }
@@ -77,16 +88,22 @@ saveKeyBtn.addEventListener('click', () => {
   const key = apiKeyInput.value.trim();
   if (!key) return;
   apiKey = key;
-  localStorage.setItem('vidya_api_key', key);
+  localStorage.setItem('visha_api_key', key);
   hideApiModal();
   showApp();
 });
 
 function showApp() {
   app.classList.remove('hidden');
+  updateMotivationalQuote();
   renderWelcome();
   renderQuickPrompts();
   userInput.focus();
+}
+
+function updateMotivationalQuote() {
+  const quote = MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+  if (motivationalBanner) motivationalBanner.textContent = quote;
 }
 
 // ── Chat Logic ──────────────────────────────────────────────
@@ -103,10 +120,10 @@ async function sendMessage() {
   appendUserMessage(text);
   
   // Add to history
-  if (conversationHistory.length === 0) {
-    conversationHistory.push({ role: "system", content: SYSTEM_PROMPT });
+  if (chatHistory.length === 0) {
+    chatHistory.push({ role: "system", content: SYSTEM_PROMPT });
   }
-  conversationHistory.push({ role: "user", content: currentSubject === 'General' ? text : `[Subject: ${currentSubject}] ${text}` });
+  chatHistory.push({ role: "user", content: currentSubject === 'General' ? text : `[Subject: ${currentSubject}] ${text}` });
 
   const typingEl = showTyping();
   isLoading = true;
@@ -121,7 +138,7 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
-        messages: conversationHistory,
+        messages: chatHistory,
         temperature: 0.7,
         max_tokens: 1024
       }),
@@ -135,7 +152,7 @@ async function sendMessage() {
     const data = await res.json();
     const reply = data.choices[0].message.content;
     
-    conversationHistory.push({ role: "assistant", content: reply });
+    chatHistory.push({ role: "assistant", content: reply });
     removeTyping(typingEl);
     appendBotMessage(reply, currentSubject);
   } catch (err) {
@@ -209,10 +226,26 @@ document.querySelectorAll('.subject-btn, .tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     currentSubject = btn.dataset.subject;
     const cfg = SUBJECT_CONFIG[currentSubject];
+    
+    // Update UI elements
     currentSubjectIcon.textContent = cfg.icon;
     currentSubjectLabel.textContent = currentSubject;
-    subjectChip.style.setProperty('--chip-color', cfg.color);
+    if (subjectChip) subjectChip.style.setProperty('--chip-color', cfg.color);
+    
+    // Toggle active class on all buttons (sync sidebar and mobile)
+    document.querySelectorAll('.subject-btn, .tab-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.subject === currentSubject);
+    });
+
+    chatHistory = []; // Clear history on subject change
+    appendBotMessage(`Switched to **${currentSubject}** mode. ${cfg.hint}`, currentSubject);
     renderQuickPrompts();
+
+    // On mobile, close sidebar and overlay after selection
+    if (window.innerWidth <= 768) {
+      sidebar?.classList.remove('open');
+      document.getElementById('sidebar-overlay')?.classList.remove('show');
+    }
   });
 });
 
@@ -232,10 +265,40 @@ function renderWelcome() {
   const div = document.createElement('div');
   div.className = 'welcome-card';
   div.innerHTML = `
-    <span class="welcome-emoji">🎓</span>
-    <h3>Vanakkam! I'm Vidya AI</h3>
-    <p>Your personal study buddy powered by Groq! Ask me anything about <strong>Math, Science, History, or English</strong>.</p>
+    <div class="welcome-logo-wrap">
+      <span class="welcome-emoji logo-animated">🎓</span>
+    </div>
+    <h3>Vanakkam! I'm Visha AI</h3>
+    <p>Your premium study assistant. Let's make learning exciting! 🚀</p>
+    <div class="welcome-stats">
+      <div class="stat-item"><span>📚</span> Subjects</div>
+      <div class="stat-item"><span>⚡</span> Fast AI</div>
+      <div class="stat-item"><span>❤️</span> For You</div>
+    </div>
   `;
   chatMessages.appendChild(div);
   scrollToBottom();
 }
+// Sidebar & Menu Logic
+const menuToggle = document.getElementById('menu-toggle');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+const clearChatBtn = document.getElementById('clear-chat-btn');
+
+menuToggle?.addEventListener('click', () => {
+  sidebar?.classList.add('open');
+  sidebarOverlay?.classList.add('show');
+});
+
+sidebarOverlay?.addEventListener('click', () => {
+  sidebar?.classList.remove('open');
+  sidebarOverlay?.classList.remove('show');
+});
+
+clearChatBtn?.addEventListener('click', () => {
+  if (confirm('Are you sure you want to clear the entire chat?')) {
+    chatMessages.innerHTML = '';
+    chatHistory = [];
+    document.getElementById('quick-prompts-container').style.display = 'block';
+    renderWelcome();
+  }
+});

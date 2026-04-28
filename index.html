@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vidya AI – Your Smart Study Assistant</title>
-  <meta name="description" content="Vidya AI is a friendly AI-powered study assistant for Indian students. Get help in Math, Science, History, English and more with simple, clear explanations." />
+  <title>Visha AI – Your Smart Study Assistant</title>
+  <meta name="description" content="Visha AI is a friendly AI-powered study assistant for Indian students. Get help in Math, Science, History, English and more with simple, clear explanations." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -19,7 +19,7 @@
         <div class="logo-ring"></div>
         <span class="logo-icon">🎓</span>
       </div>
-      <h1 class="splash-title">Vidya <span>AI</span></h1>
+      <h1 class="splash-title">Visha <span>AI</span></h1>
       <p class="splash-sub">Your Smart Study Assistant</p>
       <div class="splash-loader">
         <div class="loader-bar"></div>
@@ -32,7 +32,7 @@
     <div class="modal-box">
       <div class="modal-icon">🔑</div>
       <h2>Enter Gemini API Key</h2>
-      <p>Vidya AI uses Google's Gemini to answer your questions. Enter your API key to get started.</p>
+      <p>Visha AI uses Google's Gemini to answer your questions. Enter your API key to get started.</p>
       <div class="modal-input-wrap">
         <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" />
         <button id="toggle-key-visibility" title="Show/Hide key">👁️</button>
@@ -54,7 +54,7 @@
         <div class="brand">
           <span class="brand-icon">🎓</span>
           <div>
-            <span class="brand-name">Vidya <strong>AI</strong></span>
+            <span class="brand-name">Visha <strong>AI</strong></span>
             <span class="brand-tagline">Smart Study Assistant</span>
           </div>
         </div>
@@ -63,16 +63,16 @@
       <nav class="subject-nav">
         <p class="nav-label">Choose Subject</p>
         <button class="subject-btn active" data-subject="General" id="btn-general">
-          <span class="subject-icon">💬</span>
+          <span class="subject-icon">⭐</span>
           <span>General</span>
           <span class="subject-badge">All</span>
         </button>
         <button class="subject-btn" data-subject="Math" id="btn-math">
-          <span class="subject-icon">📐</span>
+          <span class="subject-icon">🧮</span>
           <span>Mathematics</span>
         </button>
         <button class="subject-btn" data-subject="Science" id="btn-science">
-          <span class="subject-icon">🔬</span>
+          <span class="subject-icon">🧪</span>
           <span>Science</span>
         </button>
         <button class="subject-btn" data-subject="History" id="btn-history">
@@ -80,7 +80,7 @@
           <span>History</span>
         </button>
         <button class="subject-btn" data-subject="English" id="btn-english">
-          <span class="subject-icon">📝</span>
+          <span class="subject-icon">📘</span>
           <span>English</span>
         </button>
       </nav>
@@ -89,19 +89,21 @@
         <button id="clear-chat-btn" class="sidebar-action-btn">
           <span>🗑️</span> Clear Chat
         </button>
-        <button id="change-key-btn" class="sidebar-action-btn">
-          <span>🔑</span> Change API Key
-        </button>
       </div>
 
       <div class="sidebar-footer">
         <p>Made with ❤️ for Indian Students</p>
-        <p class="footer-sub">Powered by Gemini AI</p>
+        <p class="footer-sub">Vanakkam! Happy Learning 🙏</p>
       </div>
     </aside>
 
     <!-- MAIN CHAT AREA -->
     <main id="main-chat">
+
+      <!-- MOTIVATIONAL BANNER -->
+      <div id="motivational-banner">
+        💡 Tip of the day: Consistency beats talent!
+      </div>
 
       <!-- TOP BAR -->
       <header id="chat-header">
@@ -109,17 +111,20 @@
           <span></span><span></span><span></span>
         </button>
         <div class="header-info">
-          <div class="header-avatar">🎓</div>
+          <div class="header-avatar logo-animated">🎓</div>
           <div>
-            <h2 id="chat-title">Vidya AI</h2>
+            <h2 id="chat-title">Visha AI</h2>
             <span id="chat-subtitle" class="chat-status">
-              <span class="status-dot"></span> Ready to help you learn!
+              <span class="status-dot"></span> Your AI Study Buddy
             </span>
           </div>
         </div>
         <div class="header-right">
+          <div id="streak-counter" class="streak-counter">
+            🔥 3 day study streak!
+          </div>
           <div id="subject-chip" class="subject-chip">
-            <span id="current-subject-icon">💬</span>
+            <span id="current-subject-icon">⭐</span>
             <span id="current-subject-label">General</span>
           </div>
         </div>
@@ -127,11 +132,11 @@
 
       <!-- SUBJECT TABS (mobile) -->
       <div id="subject-tabs-mobile">
-        <button class="tab-btn active" data-subject="General">💬 General</button>
-        <button class="tab-btn" data-subject="Math">📐 Math</button>
-        <button class="tab-btn" data-subject="Science">🔬 Science</button>
+        <button class="tab-btn active" data-subject="General">⭐ General</button>
+        <button class="tab-btn" data-subject="Math">🧮 Math</button>
+        <button class="tab-btn" data-subject="Science">🧪 Science</button>
         <button class="tab-btn" data-subject="History">📜 History</button>
-        <button class="tab-btn" data-subject="English">📝 English</button>
+        <button class="tab-btn" data-subject="English">📘 English</button>
       </div>
 
       <!-- MESSAGES -->
@@ -150,7 +155,7 @@
         <div class="input-wrap">
           <textarea
             id="user-input"
-            placeholder="Ask me anything… e.g. Explain photosynthesis simply"
+            placeholder="Ask Visha AI anything... 🚀"
             rows="1"
             maxlength="2000"
             aria-label="Your message"
