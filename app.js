@@ -283,6 +283,7 @@ function renderWelcome() {
 const menuToggle = document.getElementById('menu-toggle');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 const clearChatBtn = document.getElementById('clear-chat-btn');
+const changeKeyBtn = document.getElementById('change-key-btn');
 
 menuToggle?.addEventListener('click', () => {
   sidebar?.classList.add('open');
@@ -301,4 +302,9 @@ clearChatBtn?.addEventListener('click', () => {
     document.getElementById('quick-prompts-container').style.display = 'block';
     renderWelcome();
   }
+});
+
+changeKeyBtn?.addEventListener('click', () => {
+  showApiModal();
+  apiKeyInput.value = apiKey;
 });
