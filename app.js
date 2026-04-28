@@ -52,14 +52,31 @@ let apiKey = localStorage.getItem('visha_api_key') || '';
 // Function to load API key from .env file (for local development)
 async function loadEnvApiKey() {
   if (apiKey) return true; // Already have a key
+  
+  // 1. Try Vercel API route (for production)
+  try {
+    const response = await fetch('/api/config');
+    if (response.ok) {
+      const data = await response.json();
+      if (data.apiKey) {
+        apiKey = data.apiKey;
+        return true;
+      }
+    }
+  } catch (err) {
+    console.log('Vercel API config not found, trying .env...');
+  }
+
+  // 2. Try local .env file (for local npx serve development)
   try {
     const response = await fetch('.env');
-    if (!response.ok) return false;
-    const text = await response.text();
-    const match = text.match(/GROQ_API_KEY\s*=\s*([^\s\n]+)/);
-    if (match && match[1]) {
-      apiKey = match[1].trim();
-      return true;
+    if (response.ok) {
+      const text = await response.text();
+      const match = text.match(/GROQ_API_KEY\s*=\s*([^\s\n]+)/);
+      if (match && match[1]) {
+        apiKey = match[1].trim();
+        return true;
+      }
     }
   } catch (err) {
     console.warn('Could not load .env file:', err);
