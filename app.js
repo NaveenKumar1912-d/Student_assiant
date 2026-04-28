@@ -48,6 +48,24 @@ const MOTIVATIONAL_QUOTES = [
 
 // ── State ──────────────────────────────────────────────────
 let apiKey = localStorage.getItem('visha_api_key') || '';
+
+// Function to load API key from .env file (for local development)
+async function loadEnvApiKey() {
+  if (apiKey) return true; // Already have a key
+  try {
+    const response = await fetch('.env');
+    if (!response.ok) return false;
+    const text = await response.text();
+    const match = text.match(/GROQ_API_KEY\s*=\s*([^\s\n]+)/);
+    if (match && match[1]) {
+      apiKey = match[1].trim();
+      return true;
+    }
+  } catch (err) {
+    console.warn('Could not load .env file:', err);
+  }
+  return false;
+}
 let currentSubject = 'General';
 let chatHistory = []; // { role, content }
 let isLoading = false;
@@ -70,7 +88,10 @@ const sidebar         = document.getElementById('sidebar');
 const motivationalBanner = document.getElementById('motivational-banner');
 
 // ── Init ────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  // Try to load key from .env if not in localStorage
+  await loadEnvApiKey();
+  
   setTimeout(() => {
     splash.style.display = 'none';
     if (apiKey) {
