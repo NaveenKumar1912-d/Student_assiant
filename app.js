@@ -4,11 +4,6 @@
 
 'use strict';
 
-// ── Constants ──────────────────────────────────────────────
-// Proxy added to prevent "Failed to fetch" CORS error in browser
-// More robust proxy for Groq API
-const GROQ_API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://api.groq.com/openai/v1/chat/completions');
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const MAX_RETRIES = 3;
 
 const SYSTEM_PROMPT = `You are Visha AI, a friendly and smart student study assistant. Help students understand difficult concepts in simple language. Always explain with examples. Keep answers short and clear. You specialize in Math, Science, History, and English for Indian students.
@@ -47,52 +42,13 @@ const MOTIVATIONAL_QUOTES = [
 ];
 
 // ── State ──────────────────────────────────────────────────
-let apiKey = localStorage.getItem('visha_api_key') || '';
-
-// Function to load API key from .env file (for local development)
-async function loadEnvApiKey() {
-  if (apiKey) return true; // Already have a key
-  
-  // 1. Try Vercel API route (for production)
-  try {
-    const response = await fetch('/api/config');
-    if (response.ok) {
-      const data = await response.json();
-      if (data.apiKey) {
-        apiKey = data.apiKey;
-        return true;
-      }
-    }
-  } catch (err) {
-    console.log('Vercel API config not found, trying .env...');
-  }
-
-  // 2. Try local .env file (for local npx serve development)
-  try {
-    const response = await fetch('.env');
-    if (response.ok) {
-      const text = await response.text();
-      const match = text.match(/GROQ_API_KEY\s*=\s*([^\s\n]+)/);
-      if (match && match[1]) {
-        apiKey = match[1].trim();
-        return true;
-      }
-    }
-  } catch (err) {
-    console.warn('Could not load .env file:', err);
-  }
-  return false;
-}
 let currentSubject = 'General';
 let chatHistory = []; // { role, content }
 let isLoading = false;
 
 // ── DOM Refs ────────────────────────────────────────────────
 const splash          = document.getElementById('splash-screen');
-const apiModal        = document.getElementById('api-modal');
 const app             = document.getElementById('app');
-const apiKeyInput     = document.getElementById('api-key-input');
-const saveKeyBtn      = document.getElementById('save-api-key-btn');
 const chatMessages    = document.getElementById('chat-messages');
 const userInput       = document.getElementById('user-input');
 const sendBtn         = document.getElementById('send-btn');
@@ -105,30 +61,11 @@ const sidebar         = document.getElementById('sidebar');
 const motivationalBanner = document.getElementById('motivational-banner');
 
 // ── Init ────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', async () => {
-  // Try to load key from .env if not in localStorage
-  await loadEnvApiKey();
-  
+window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     splash.style.display = 'none';
-    if (apiKey) {
-      showApp();
-    } else {
-      showApiModal();
-    }
+    showApp();
   }, 1500);
-});
-
-function showApiModal() { apiModal.classList.remove('hidden'); }
-function hideApiModal() { apiModal.classList.add('hidden'); }
-
-saveKeyBtn.addEventListener('click', () => {
-  const key = apiKeyInput.value.trim();
-  if (!key) return;
-  apiKey = key;
-  localStorage.setItem('visha_api_key', key);
-  hideApiModal();
-  showApp();
 });
 
 function showApp() {
@@ -168,17 +105,13 @@ async function sendMessage() {
   sendBtn.disabled = true;
 
   try {
-    const res = await fetch(GROQ_API_URL, {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: chatHistory,
-        temperature: 0.7,
-        max_tokens: 1024
+        messages: chatHistory
       }),
     });
 
@@ -195,7 +128,7 @@ async function sendMessage() {
     appendBotMessage(reply, currentSubject);
   } catch (err) {
     removeTyping(typingEl);
-    appendBotMessage(`⚠️ Error: ${err.message}. Please check your Groq API key.`, 'General');
+    appendBotMessage(`⚠️ Error: ${err.message}. Please check your connection or try again later.`, 'General');
   } finally {
     isLoading = false;
     sendBtn.disabled = false;
@@ -321,7 +254,6 @@ function renderWelcome() {
 const menuToggle = document.getElementById('menu-toggle');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 const clearChatBtn = document.getElementById('clear-chat-btn');
-const changeKeyBtn = document.getElementById('change-key-btn');
 
 menuToggle?.addEventListener('click', () => {
   sidebar?.classList.add('open');
@@ -342,7 +274,4 @@ clearChatBtn?.addEventListener('click', () => {
   }
 });
 
-changeKeyBtn?.addEventListener('click', () => {
-  showApiModal();
-  apiKeyInput.value = apiKey;
-});
+// Remove changeKeyBtn logic as API is now managed by server
