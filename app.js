@@ -93,7 +93,13 @@ function updateMotivationalQuote() {
 
 // ── Chat Logic ──────────────────────────────────────────────
 async function sendMessage() {
-  const text = userInput.value.trim();
+  let text = userInput.value.trim();
+  
+  // If no text but a PDF is attached, default to asking for a summary
+  if (!text && pdfContent) {
+    text = "Please summarize this document and tell me the key points.";
+  }
+  
   if (!text || isLoading) return;
 
   // UI Reset
@@ -102,11 +108,11 @@ async function sendMessage() {
   charCount.textContent = '0/2000';
   document.getElementById('quick-prompts-container').style.display = 'none';
 
-  appendUserMessage(text);
+  appendUserMessage(text, pdfFileName);
 
   // User content: include subject tag only when no PDF is active
   const userContent = pdfContent
-    ? text
+    ? `[Attached Document: ${pdfFileName}]\n\n${text}`
     : (currentSubject === 'General' ? text : `[Subject: ${currentSubject}] ${text}`);
   chatHistory.push({ role: 'user', content: userContent });
 
@@ -153,10 +159,18 @@ async function sendMessage() {
 }
 
 // ── Rendering & Utils ───────────────────────────────────────
-function appendUserMessage(text) {
+function appendUserMessage(text, attachedFile = null) {
   const row = document.createElement('div');
   row.className = 'msg-row user';
-  row.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-content"><div class="msg-bubble">${escapeHtml(text)}</div></div>`;
+  
+  let attachmentHtml = '';
+  if (attachedFile) {
+    attachmentHtml = `<div style="background: rgba(255,255,255,0.1); padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.2);">
+      📄 <strong>${escapeHtml(attachedFile)}</strong>
+    </div><br>`;
+  }
+  
+  row.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-content"><div class="msg-bubble">${attachmentHtml}${escapeHtml(text)}</div></div>`;
   chatMessages.appendChild(row);
   scrollToBottom();
 }
