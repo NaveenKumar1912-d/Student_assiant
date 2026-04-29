@@ -137,7 +137,16 @@
 
       <!-- INPUT AREA -->
       <div id="chat-input-area">
+
+        <!-- PDF Status Bar -->
+        <div id="pdf-status-bar" class="hidden">
+          <div id="pdf-badge">📄 <span id="pdf-filename"></span></div>
+          <button id="pdf-remove-btn" title="Remove PDF">✕ Remove PDF</button>
+        </div>
+
         <div class="input-wrap">
+          <input type="file" id="pdf-upload" accept=".pdf" aria-label="Upload PDF">
+          <button id="pdf-upload-btn" title="Upload a PDF" aria-label="Upload PDF">📎</button>
           <textarea
             id="user-input"
             placeholder="Ask Visha AI anything... 🚀"
@@ -155,7 +164,7 @@
             </button>
           </div>
         </div>
-        <p class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</p>
+        <p class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line · <kbd>📎</kbd> to upload PDF</p>
       </div>
 
     </main>
@@ -164,6 +173,7 @@
   <!-- OVERLAY for mobile sidebar -->
   <div id="sidebar-overlay"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
